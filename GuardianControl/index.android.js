@@ -1,35 +1,12 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
- */
+import React, {Component} from 'react'
+import {BleManager} from 'react-native-ble-plx'
 
-import React, { Component } from 'react';
 import {
   AppRegistry,
   StyleSheet,
   Text,
   View
-} from 'react-native';
-
-export default class GuardianControl extends Component {
-  render() {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Welcome to React Native!
-        </Text>
-        <Text style={styles.instructions}>
-          To get started, edit index.android.js
-        </Text>
-        <Text style={styles.instructions}>
-          Double tap R on your keyboard to reload,{'\n'}
-          Shake or press menu button for dev menu
-        </Text>
-      </View>
-    );
-  }
-}
+} from 'react-native'
 
 const styles = StyleSheet.create({
   container: {
@@ -48,6 +25,26 @@ const styles = StyleSheet.create({
     color: '#333333',
     marginBottom: 5,
   },
-});
+})
 
-AppRegistry.registerComponent('GuardianControl', () => GuardianControl);
+export default class GuardianControl extends Component {
+  componentWi
+  render() {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.welcome}>
+          Welcome to React Native!!
+        </Text>
+        <Text style={styles.instructions}>
+          To get started, edit index.android.js
+        </Text>
+        <Text style={styles.instructions}>
+          Double tap R on your keyboard to reload,{'\n'}
+          Shake or press menu button for dev menu
+        </Text>
+      </View>
+    )
+  }
+}
+
+AppRegistry.registerComponent('GuardianControl', () => GuardianControl)
