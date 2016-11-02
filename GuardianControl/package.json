@@ -9,6 +9,7 @@
   "dependencies": {
     "react": "15.3.2",
     "react-native": "0.36.1",
+    "react-native-android-permissions": "0.0.7",
     "react-native-ble-plx": "^0.3.3"
   },
   "jest": {

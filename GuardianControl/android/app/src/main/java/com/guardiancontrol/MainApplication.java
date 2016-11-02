@@ -11,6 +11,8 @@ import com.facebook.react.shell.MainReactPackage;
 
 import com.polidea.reactnativeble.BlePackage;
 
+import com.burnweb.rnpermissions.RNPermissionsPackage;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -26,7 +28,8 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-          new BlePackage()
+          new BlePackage(),
+          new RNPermissionsPackage()
       );
     }
   };
