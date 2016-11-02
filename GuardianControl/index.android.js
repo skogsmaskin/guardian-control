@@ -45,22 +45,26 @@ export default class GuardianControl extends Component {
 
   checkAndGrantPermissions() {
     checkPermission('android.permission.ACCESS_COARSE_LOCATION').then(result => {
-      console.log('Already Granted!')
-      console.log(result)
-      this.manager.startDeviceScan(null, null, this.handleDiscoveredDevice)
-      setTimeout(() => {
-        this.manager.stopDeviceScan()
-      }, 5000)
+      console.log('Already Granted!', result)
+      this.performScan()
     }, result => {
       console.log('Not Granted!')
       console.log(result)
       requestPermission('android.permission.ACCESS_COARSE_LOCATION').then(reqResult => {
         console.log('Granted!', reqResult)
+        this.performScan()
       }, deniedResult => {
         console.log('Not Granted!')
         console.log(deniedResult)
       })
     })
+  }
+
+  performScan() {
+    this.manager.startDeviceScan(null, null, this.handleDiscoveredDevice)
+    setTimeout(() => {
+      this.manager.stopDeviceScan()
+    }, 5000)
   }
 
   handleDiscoveredDevice(error, scannedDevice) {
