@@ -1,27 +1,31 @@
 import {
   StyleSheet,
-  Image
 } from 'react-native'
 
 export default StyleSheet.create({
-  scene: {
-  },
-  background: {
-    zIndex: 0,
-    position: 'absolute'
-  },
-  foreground: {
-    zIndex: 1
+  rootContainer: {
+    flex: 1,
+    backgroundColor: '#000'
   },
   backgroundImage: {
-    justifyContent: 'center',
-    alignItems: 'center',
     flex: 1,
-    resizeMode: Image.resizeMode.contain
+    width: undefined,
+    height: undefined,
+    backgroundColor: 'transparent',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  toolbarContainer: {
+    justifyContent: 'flex-start',
+    alignItems: 'stretch',
+  },
+  toolbar: {
+    height: 56,
+    opacity: 0.5,
+    backgroundColor: '#ddd'
   },
   text: {
-    color: '#fff',
-    fontSize: 15,
+    fontSize: 16,
   },
   boldText: {
     fontWeight: 'bold'
@@ -30,15 +34,15 @@ export default StyleSheet.create({
     color: '#ccc',
     fontSize: 14
   },
+  scrollView: {
+  },
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center'
   },
-  devices: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
+  content: {
+    padding: 15
   },
   errorMessage: {
     padding: 20,
@@ -80,8 +84,7 @@ export default StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
-    padding: 10,
-    backgroundColor: '#fff'
+    padding: 10
   },
   rowText: {
   },
@@ -98,13 +101,6 @@ export default StyleSheet.create({
   },
   rowIcon: {
     fontSize: 40,
-  },
-  toolbarContainer: {
-    justifyContent: 'flex-start',
-    alignItems: 'stretch',
-  },
-  toolbar: {
-    backgroundColor: '#fff',
-    height: 56
+    paddingRight: 4
   }
 })

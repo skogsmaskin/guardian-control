@@ -7,8 +7,11 @@ import {
   Text,
   View,
   Image,
+  ScrollView,
+  RefreshControl,
   ToolbarAndroid,
-  NativeAppEventEmitter
+  NativeAppEventEmitter,
+  Dimensions
 } from 'react-native'
 
 import DeviceList from '../DeviceList'
@@ -69,6 +72,7 @@ export default class ScanBleScene extends Component {
 
   componentDidMount() {
     BleManager.start()
+    this.start()
   }
 
   componentWillUnmount() {
@@ -183,8 +187,8 @@ export default class ScanBleScene extends Component {
     const state = this.state
     const {error} = this.state
     return (
-      <View style={styles.scene}>
-        <View style={styles.toolbarContainer}>
+      <Image source={require('../../img/pipe-bg.png')} style={styles.backgroundImage}>
+        <View>
           <ToolbarAndroid
             style={styles.toolbar}
             title={this.props.title}
@@ -193,63 +197,78 @@ export default class ScanBleScene extends Component {
             onActionSelected={this.handleToolbarActionSelected}
             actions={[{title: this.state.scanning ? 'Stop scan' : 'Scan', show: 'always'}]}
           />
-        </View>
-        <View style={styles.background}>
-          <Image source={require('../../img/pipe-bg.png')} style={styles.backgroundImage} />
-        </View>
 
-        <View style={styles.foreground}>
+          <ScrollView
+            style={styles.scrollView}
+            refreshControl={
+              <RefreshControl
+                refreshing={this.state.scanning}
+                onRefresh={this.handleRefreshDevices}
+              />
+            }
+          >
 
-          { error && (
-            <View style={styles.container}>
-              <Text style={styles.errorMessage}>
-                {state.error.message}
+            {
+              this.state.devices.length > 0 && (
+                <View style={styles.topLine}>
+                  <Text style={styles.boldText}>Available devices:</Text>
+                </View>
+              )
+            }
+
+            <DeviceList
+              onPressItem={this.handleSelectDevice}
+              scanning={this.state.scanning}
+              devices={this.state.devices}
+              onRefresh={this.handleRefreshDevices}
+            />
+
+            <View style={styles.content}>
+              <Text style={styles.text}>
+                {
+                  this.state.devices.length === 0
+                    ? 'Press scan to search for your pipe by bluetooth.\nMake sure it is powered on and nearby.'
+                    : 'Select your pipe in the list above, it is usually named "epv".'
+                }
               </Text>
-              {
-                error.code === 'bluetoothNotSupported' && (
-                  <Button
-                    containerStyle={styles.buttonContainer}
-                    style={styles.button}
-                    onPress={this.handlePermissionButtonPress}
-                  >
-                    Turn on bluetooth
-                  </Button>
-                )
-              }
-              {
-                error.code === 'bluetoothNotReady' && (
-                  <Button
-                    containerStyle={styles.buttonContainer}
-                    style={styles.button}
-                    onPress={this.handleRestartButtonPress}
-                  >
-                    Try again
-                  </Button>
-                )
-              }
-            </View>
-          )}
 
-          {
-            this.state.devices.length > 0 && (
-              <View style={styles.topLine}>
-                <Text style={styles.boldText}>Available devices:</Text>
-              </View>
-            )
-          }
-          <DeviceList
-            onPressItem={this.handleSelectDevice}
-            scanning={this.state.scanning}
-            devices={this.state.devices}
-            onRefresh={this.handleRefreshDevices}
-          />
+              { error && (
+                <View>
+                  <Text style={styles.errorMessage}>
+                    {state.error.message}
+                  </Text>
+                  {
+                    error.code === 'bluetoothNotSupported' && (
+                      <Button
+                        containerStyle={styles.buttonContainer}
+                        style={styles.button}
+                        onPress={this.handlePermissionButtonPress}
+                      >
+                        Turn on bluetooth
+                      </Button>
+                    )
+                  }
+                  {
+                    error.code === 'bluetoothNotReady' && (
+                      <Button
+                        containerStyle={styles.buttonContainer}
+                        style={styles.button}
+                        onPress={this.handleRestartButtonPress}
+                      >
+                        Try again
+                      </Button>
+                    )
+                  }
+                </View>
+              )}
+            </View>
+          </ScrollView>
           <View style={styles.bottomLine}>
-            <Text style={styles.smallText}>
-              To get started select your pipe in the list above.
-            </Text>
+            <Text style={styles.smallText}>ewrerwer</Text>
           </View>
         </View>
-      </View>
+
+      </Image>
     )
   }
 }

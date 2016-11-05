@@ -3,7 +3,7 @@ import {requestPermission, checkPermission} from 'react-native-android-permissio
 import {
   AppRegistry,
   View,
-  ToolbarAndroid,
+  StatusBar,
   Navigator,
 } from 'react-native'
 
@@ -70,17 +70,10 @@ export default class GuardianControl extends Component {
   }
 
   renderBleScene = () => {
-    return (
-      <View style={styles.scene}>
-        {
-          this.state.permissionsGranted
-            && !this.state.selectedDevice
-            && (
-              <ScanBle title={'Find your device'} />
-            )
-        }
-      </View>
-    )
+    if (this.state.permissionsGranted) {
+      return <ScanBle title={'Find your pipe'} />
+    }
+    return null
   }
 
   renderErrorScene() {
@@ -101,19 +94,22 @@ export default class GuardianControl extends Component {
 
   renderScene = (route, navigator) => {
     const scene = this.state.error ? this.renderErrorScene : this.renderBleScene
-    return (
-      <View>
-        {scene(route, navigator)}
-      </View>
-    )
+    return scene(route, navigator)
   }
 
   render() {
 
     return (
-      <Navigator
-        initialRoute={{title: 'Scan for device', index: 0}}
-        renderScene={this.renderScene} /> // Navigator closing tag
+      <View style={styles.rootContainer}>
+        <StatusBar
+          backgroundColor="black"
+          barStyle="light-content"
+        />
+        <Navigator
+          initialRoute={{title: 'Scan for device', index: 0}}
+          renderScene={this.renderScene}
+        />
+      </View>
     )
   }
 }

@@ -78,12 +78,6 @@ export default class DeviceList extends Component {
   render() {
     return (
       <ListView
-        refreshControl={
-          <RefreshControl
-            refreshing={this.props.scanning}
-            onRefresh={this.handleRefresh}
-          />
-        }
         enableEmptySections
         dataSource={this.state.dataSource}
         style={styles.list}
