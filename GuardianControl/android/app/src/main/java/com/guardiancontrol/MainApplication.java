@@ -10,7 +10,7 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 
 import com.polidea.reactnativeble.BlePackage;
-
+import it.innove.BleManagerPackage;
 import com.burnweb.rnpermissions.RNPermissionsPackage;
 
 import java.util.Arrays;
@@ -29,6 +29,7 @@ public class MainApplication extends Application implements ReactApplication {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
           new BlePackage(),
+          new BleManagerPackage(),
           new RNPermissionsPackage()
       );
     }

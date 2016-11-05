@@ -16,6 +16,7 @@
       "ignore": [".*:.*"]
     }],
     "import/no-extraneous-dependencies": "off",
+    "no-console": "warn",
     "sort-imports": [1, {
       "ignoreCase": true,
       "ignoreMemberSort": true,

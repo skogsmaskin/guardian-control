@@ -1,93 +1,119 @@
 import React, {Component} from 'react'
-import {BleManager} from 'react-native-ble-plx'
 import {requestPermission, checkPermission} from 'react-native-android-permissions'
-
 import {
   AppRegistry,
-  StyleSheet,
-  Text,
-  View
+  View,
+  ToolbarAndroid,
+  Navigator,
 } from 'react-native'
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
-})
+import permissions from './components/scenes/Permissions'
+import DeviceList from './components/DeviceList'
+import ScanBle from './components/scenes/ScanBle'
+import styles from './styles'
+
+const SCANTIME = 10
+const APP_TITLE = 'Guardian Control'
 
 export default class GuardianControl extends Component {
 
   constructor(props) {
     super(props)
-    this.manager = new BleManager()
+    this.state = {
+      permissionsGranted: true,
+      error: null,
+    }
+
+    //intercept react-native error handling
+    if (typeof ErrorUtils !== 'undefined') {
+      this.defaultHandler = (ErrorUtils.getGlobalHandler && ErrorUtils.getGlobalHandler()) || ErrorUtils._globalHandler
+      ErrorUtils.setGlobalHandler(this.wrapGlobalHandler)  //feed errors directly to our wrapGlobalHandler function
+    }
   }
 
-  componentDidMount() {
-    this.checkAndGrantPermissions()
-  }
-
-  componentWillUnmount() {
-    this.manager.destroy()
+  wrapGlobalHandler = (error, isFatal) => {
+    //do anything with the error here
+    console.error(error)
+    this.defaultHandler(error, isFatal)  //after you're finished, call the defaultHandler so that react-native also gets the error
   }
 
   checkAndGrantPermissions() {
     checkPermission('android.permission.ACCESS_COARSE_LOCATION').then(result => {
       console.log('Already Granted!', result)
-      this.performScan()
+      this.setState({permissionsGranted: true})
     }, result => {
       console.log('Not Granted!')
       console.log(result)
+      this.setState({permissionsGranted: false})
       requestPermission('android.permission.ACCESS_COARSE_LOCATION').then(reqResult => {
         console.log('Granted!', reqResult)
-        this.performScan()
+        this.setState({permissionsGranted: true})
       }, deniedResult => {
+        this.setState({permissionsGranted: false})
         console.log('Not Granted!')
         console.log(deniedResult)
       })
     })
   }
 
-  performScan() {
-    this.manager.startDeviceScan(null, null, this.handleDiscoveredDevice)
-    setTimeout(() => {
-      this.manager.stopDeviceScan()
-    }, 5000)
+  start() {
+    this.setState({error: null})
+    this.checkAndGrantPermissions()
   }
 
-  handleDiscoveredDevice(error, scannedDevice) {
-    if (error) {
-      return console.log(error)
-    }
-    return console.log(scannedDevice)
+  handleRestartButtonPress = () => {
+    this.start()
+  }
+
+  handlePermissionButtonPress = () => {
+    this.checkAndGrantPermissions()
+  }
+
+  renderBleScene = () => {
+    return (
+      <View style={styles.scene}>
+        {
+          this.state.permissionsGranted
+            && !this.state.selectedDevice
+            && (
+              <ScanBle title={'Find your device'} />
+            )
+        }
+      </View>
+    )
+  }
+
+  renderErrorScene() {
+    return (
+      <View style={styles.scene}>
+        {
+          !this.state.permissionsGranted
+            && (
+              <Permissions
+                title="Error"
+                navigator={navigator}
+              />
+            )
+        }
+      </View>
+    )
+  }
+
+  renderScene = (route, navigator) => {
+    const scene = this.state.error ? this.renderErrorScene : this.renderBleScene
+    return (
+      <View>
+        {scene(route, navigator)}
+      </View>
+    )
   }
 
   render() {
+
     return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Welcome to React Native!
-        </Text>
-        <Text style={styles.instructions}>
-          To get started, edit index.android.js
-        </Text>
-        <Text style={styles.instructions}>
-          Double tap R on your keyboard to reload,{'\n'}
-          Shake or press menu button for dev menu
-        </Text>
-      </View>
+      <Navigator
+        initialRoute={{title: 'Scan for device', index: 0}}
+        renderScene={this.renderScene} /> // Navigator closing tag
     )
   }
 }
