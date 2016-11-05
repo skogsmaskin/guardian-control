@@ -23,7 +23,6 @@ export default class ScanBleScene extends Component {
     super(props)
     const devicesDB = {}
     this.state = {
-      permissionsGranted: true,
       error: null,
       connectedDevice: null,
       devicesDB: devicesDB,
@@ -33,24 +32,6 @@ export default class ScanBleScene extends Component {
 
     this.discoverSubscription = null
     this.scanStopSubscription = null
-
-    //intercept react-native error handling
-    if (typeof ErrorUtils !== 'undefined') {
-      this.defaultHandler = (ErrorUtils.getGlobalHandler && ErrorUtils.getGlobalHandler()) || ErrorUtils._globalHandler
-      ErrorUtils.setGlobalHandler(this.wrapGlobalHandler)  //feed errors directly to our wrapGlobalHandler function
-    }
-  }
-
-  wrapGlobalHandler = (error, isFatal) => {
-    //do anything with the error here
-    console.error(error)
-    this.defaultHandler(error, isFatal)  //after you're finished, call the defaultHandler so that react-native also gets the error
-  }
-
-  static get defaultProps() {
-    return {
-      title: 'Scan for you pipe'
-    }
   }
 
   componentDidMount() {
@@ -59,6 +40,9 @@ export default class ScanBleScene extends Component {
   }
 
   componentWillUnmount() {
+    if (this.state.connectedDevice) {
+      BleManager.disconnect(this.state.connectedDevice)
+    }
     if (this.state.scanning) {
       BleManager.stopScan()
     }
@@ -133,9 +117,15 @@ export default class ScanBleScene extends Component {
   connect = device => {
     console.log(`Connecting to ${device.id}`)
     return BleManager.connect(device.id)
-      .then(peripheralInfo => {
-        console.log('Connected')
-        return peripheralInfo
+      .then(connectedDevice => {
+        const charectaristics = connectedDevice.characteristics
+          .filter(char => char.service === 'fff0')
+          .filter(char => char.characteristic === 'fff1')
+        this.setState({
+          connectedDevice: connectedDevice,
+          charectaristics: charectaristics
+        })
+        return connectedDevice
       })
   }
 
@@ -144,6 +134,7 @@ export default class ScanBleScene extends Component {
     return BleManager.disconnect(device.id)
       .then(() => {
         console.log('Disconnected')
+        this.setState({connectedDevice: device})
       })
   }
 
@@ -157,10 +148,6 @@ export default class ScanBleScene extends Component {
 
   handleRestartButtonPress = () => {
     this.start()
-  }
-
-  handlePermissionButtonPress = () => {
-    this.checkAndGrantPermissions()
   }
 
   handlePressDeviceButton(device) {
@@ -234,6 +221,15 @@ export default class ScanBleScene extends Component {
             />
 
             <View style={styles.content}>
+              {
+                this.state.charectaristics && (
+                  <Text style={styles.text}>
+                    {
+                      JSON.stringify(this.state.charectaristics)
+                    }
+                  </Text>
+                )
+              }
               <Text style={styles.text}>
                 {
                   this.state.devices.length === 0
@@ -252,7 +248,7 @@ export default class ScanBleScene extends Component {
                       <Button
                         containerStyle={styles.buttonContainer}
                         style={styles.button}
-                        onPress={this.handlePermissionButtonPress}
+                        onPress={this.handleRestartButtonPress}
                       >
                         Turn on bluetooth
                       </Button>
@@ -284,9 +280,6 @@ export default class ScanBleScene extends Component {
               )}
             </View>
           </ScrollView>
-          <View style={styles.bottomLine}>
-            <Text style={styles.smallText}>ewrerwer</Text>
-          </View>
         </View>
 
       </Image>

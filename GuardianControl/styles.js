@@ -20,9 +20,7 @@ export default StyleSheet.create({
     alignItems: 'stretch',
   },
   toolbar: {
-    height: 56,
-    opacity: 0.5,
-    backgroundColor: '#ddd'
+    height: 56
   },
   text: {
     fontSize: 16,
@@ -52,21 +50,24 @@ export default StyleSheet.create({
     color: '#333'
   },
   bottomLine: {
-    padding: 20
+    padding: 20,
+    backgroundColor: 'transparent',
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   topLine: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 10,
+    height: 58
+  },
+  topLineText: {
+    fontSize: 18,
+    color: '#fff'
   },
   topSpinner: {
     marginRight: 5
-  },
-  logo: {
-    padding: 20,
-    fontSize: 30,
-    color: '#999'
   },
   buttonContainer: {
     padding: 10,

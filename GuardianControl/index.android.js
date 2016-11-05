@@ -5,15 +5,12 @@ import {
   View,
   StatusBar,
   Navigator,
+  Text
 } from 'react-native'
 
 import permissions from './components/scenes/Permissions'
-import DeviceList from './components/DeviceList'
-import ScanBle from './components/scenes/ScanBle'
+import Bluetooth from './components/scenes/Bluetooth'
 import styles from './styles'
-
-const SCANTIME = 10
-const APP_TITLE = 'Guardian Control'
 
 export default class GuardianControl extends Component {
 
@@ -69,9 +66,9 @@ export default class GuardianControl extends Component {
     this.checkAndGrantPermissions()
   }
 
-  renderBleScene = () => {
+  renderBluetoothScene = () => {
     if (this.state.permissionsGranted) {
-      return <ScanBle title={'Find your pipe'} />
+      return <Bluetooth title={'Find your pipe'} />
     }
     return null
   }
@@ -93,7 +90,7 @@ export default class GuardianControl extends Component {
   }
 
   renderScene = (route, navigator) => {
-    const scene = this.state.error ? this.renderErrorScene : this.renderBleScene
+    const scene = this.state.error ? this.renderErrorScene : this.renderBluetoothScene
     return scene(route, navigator)
   }
 
@@ -105,6 +102,9 @@ export default class GuardianControl extends Component {
           backgroundColor="black"
           barStyle="light-content"
         />
+        <View style={styles.topLine}>
+          <Text style={styles.topLineText}>Smok Guardian III Control</Text>
+        </View>
         <Navigator
           initialRoute={{title: 'Scan for device', index: 0}}
           renderScene={this.renderScene}
