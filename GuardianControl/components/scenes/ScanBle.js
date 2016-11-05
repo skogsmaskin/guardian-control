@@ -1,17 +1,14 @@
 import React, {Component} from 'react'
 import Button from 'react-native-button'
 import BleManager from 'react-native-ble-manager'
-import {requestPermission, checkPermission} from 'react-native-android-permissions'
 import {
-  AppRegistry,
   Text,
   View,
   Image,
   ScrollView,
   RefreshControl,
   ToolbarAndroid,
-  NativeAppEventEmitter,
-  Dimensions
+  NativeAppEventEmitter
 } from 'react-native'
 
 import DeviceList from '../DeviceList'
@@ -19,26 +16,12 @@ import DeviceList from '../DeviceList'
 import styles from '../../styles'
 
 const SCANTIME = 10
-const APP_TITLE = 'Guardian Control'
 
 export default class ScanBleScene extends Component {
 
   constructor(props) {
     super(props)
-    const devicesDB = {
-      // 'XX:91:48:2E:9E:4E': {id: 'XX:91:48:2E:9E:4E', name: 'test', lastSeen: new Date()},
-      // 'ZZ:91:48:2E:9E:4E': {id: 'XX:91:48:2E:9E:4E', name: 'test', lastSeen: new Date()},
-      // '23:91:48:2E:9E:4E': {id: 'XX:91:48:2E:9E:4E', name: 'test', lastSeen: new Date()},
-      // '25:91:48:2E:9E:4E': {id: 'XX:91:48:2E:9E:4E', name: 'test', lastSeen: new Date()},
-      // '76:91:48:2E:9E:4E': {id: 'XX:91:48:2E:9E:4E', name: 'test', lastSeen: new Date()},
-      // '33:91:48:2E:9E:4E': {id: 'XX:91:48:2E:9E:4E', name: 'test', lastSeen: new Date()},
-      // '52:91:48:2E:9E:4E': {id: 'XX:91:48:2E:9E:4E', name: 'test', lastSeen: new Date()},
-      // '99:91:48:2E:9E:4E': {id: 'XX:91:48:2E:9E:4E', name: 'test', lastSeen: new Date()},
-      // '36:91:48:2E:9E:4E': {id: 'XX:91:48:2E:9E:4E', name: 'test', lastSeen: new Date()},
-      // '22:91:48:2E:9E:4E': {id: 'XX:91:48:2E:9E:4E', name: 'test', lastSeen: new Date()},
-      // '19:91:48:2E:9E:4E': {id: 'XX:91:48:2E:9E:4E', name: 'test', lastSeen: new Date()},
-      // '02:91:48:2E:9E:4E': {id: 'XX:91:48:2E:9E:4E', name: 'test', lastSeen: new Date()}
-    }
+    const devicesDB = {}
     this.state = {
       permissionsGranted: true,
       error: null,
@@ -147,6 +130,23 @@ export default class ScanBleScene extends Component {
     return Promise.resolve(null)
   }
 
+  connect = device => {
+    console.log(`Connecting to ${device.id}`)
+    return BleManager.connect(device.id)
+      .then(peripheralInfo => {
+        console.log('Connected')
+        return peripheralInfo
+      })
+  }
+
+  disconnect = device => {
+    console.log(`Disconnecting ${device.id}`)
+    return BleManager.disconnect(device.id)
+      .then(() => {
+        console.log('Disconnected')
+      })
+  }
+
   toggleScanning() {
     if (this.state.scanning) {
       this.stopScan()
@@ -174,9 +174,19 @@ export default class ScanBleScene extends Component {
   }
 
   handleSelectDevice = index => {
-    const device = this.state.devices[index]
+    const device = this.state.devicesDB[this.state.devices[index].id]
     this.stopScan()
     console.log(device)
+    this.connect(device)
+      .then(peripheralInfo => {
+        console.log(peripheralInfo)
+        this.disconnect(device)
+      })
+      .catch(err => {
+        console.log(err)
+        this.setState({error: {code: 'deviceNotAvailable', message: `Could not connect to ${device.id}`}})
+        throw err
+      })
   }
 
   handleRefreshDevices = () => {
@@ -250,6 +260,17 @@ export default class ScanBleScene extends Component {
                   }
                   {
                     error.code === 'bluetoothNotReady' && (
+                      <Button
+                        containerStyle={styles.buttonContainer}
+                        style={styles.button}
+                        onPress={this.handleRestartButtonPress}
+                      >
+                        Try again
+                      </Button>
+                    )
+                  }
+                  {
+                    error.code === 'deviceNotAvailable' && (
                       <Button
                         containerStyle={styles.buttonContainer}
                         style={styles.button}
